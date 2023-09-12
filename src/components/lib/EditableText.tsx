@@ -64,6 +64,7 @@ const EditableText = ({
           onKeyUp={keyUpHandler}
           onBlur={onTextInputBlur}
           placeholder={placeholder}
+          className="w-auto"
         />
       ) : (
         <span>{initialText}</span>

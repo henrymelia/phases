@@ -3,6 +3,7 @@ import { Phase } from "../state/types";
 import EditableText from "./lib/EditableText";
 import PhaseTask from "./PhaseTask";
 import { useStartupStore } from "../state/useStartupStore";
+import PhaseHeading from "./PhaseHeading";
 
 type Props = {
   startupId: string;
@@ -41,12 +42,15 @@ function StartupPhase({ startupId, phase, position, disabled = false }: Props) {
 
   return (
     <li className="mt-4">
-      <h2>
-        {position} -{" "}
-        <EditableText text={phase.title} onSave={onUpdatePhaseTitle} />{" "}
-        {completed && "(complete)"}
-      </h2>
-      <ul className="pl-2">
+      <PhaseHeading position={position} completed={completed}>
+        <EditableText
+          text={phase.title}
+          onSave={onUpdatePhaseTitle}
+          className="font-semibold text-2xl"
+        />
+      </PhaseHeading>
+
+      <ul className="pl-3.5">
         {phase.tasks.map((task) => (
           <PhaseTask
             key={task.id}

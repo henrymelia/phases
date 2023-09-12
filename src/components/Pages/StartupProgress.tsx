@@ -10,6 +10,7 @@ import {
 import EditableText from "../lib/EditableText";
 import StartupPhase from "../StartupPhase";
 import AlertDialog from "../lib/AlertDialog";
+import PhaseHeading from "../PhaseHeading";
 
 function StartupProgress() {
   const { id } = useParams();
@@ -89,7 +90,7 @@ function StartupProgress() {
 
       <h1 className="text-3xl font-medium pb-4">
         <EditableText text={name} onSave={onStartupNameUpdate} />{" "}
-        {live && "LIVE"}
+        {live && <span className="text-green-600">(Live)</span>}
       </h1>
 
       <ul className="pl-4">
@@ -103,14 +104,15 @@ function StartupProgress() {
           />
         ))}
         <li className="mt-4">
-          {phases.length + 1} -{" "}
-          <input
-            type="text"
-            value={newPhaseTitle}
-            onChange={onNewPhaseTitleChange}
-            onKeyUp={onNewPhaseTitleKeyUp}
-            placeholder="Add a Phase"
-          />
+          <PhaseHeading position={phases.length + 1}>
+            <input
+              type="text"
+              value={newPhaseTitle}
+              onChange={onNewPhaseTitleChange}
+              onKeyUp={onNewPhaseTitleKeyUp}
+              placeholder="Add a Phase"
+            />
+          </PhaseHeading>
         </li>
       </ul>
 
