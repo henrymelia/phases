@@ -1,16 +1,27 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { Outlet, Route, Routes } from "react-router-dom";
+import ContentWithSidebarLayout from "./components/Layouts/ContentWithSidebarLayout";
+import Sidebar from "./components/Sidebar";
 import "./App.css";
-import AdminLayout from "./components/AdminLayout";
+import HomeContent from "./components/Pages/HomeContent";
+import StartupProgress from "./components/Pages/StartupProgress";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <AdminLayout>Hello</AdminLayout>
-    </>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ContentWithSidebarLayout
+            sidebar={<Sidebar />}
+            content={<Outlet />}
+          />
+        }
+      >
+        <Route index element={<HomeContent />} />
+        <Route path=":id" element={<StartupProgress />} />
+        <Route path="new" element={<span>new</span>} />
+      </Route>
+    </Routes>
   );
 }
 
