@@ -38,7 +38,9 @@ const initialStartupsState: Startup[] = [
   {
     id: "z",
     name: "ZariTech",
+    congratulated: false,
     live: false,
+    ongoingPhaseIndex: 0,
     phases: [
       {
         id: "a",
@@ -72,16 +74,39 @@ const initialStartupsState: Startup[] = [
       },
     ],
   },
-  { id: "s", name: "System Labs", live: false, phases: [] },
-  { id: "o", name: "OAKTEK", live: false, phases: [] },
-  { id: "f", name: "FortitudeTech", live: false, phases: [] },
+  {
+    id: "s",
+    name: "System Labs",
+    congratulated: false,
+    live: false,
+    ongoingPhaseIndex: 0,
+    phases: [],
+  },
+  {
+    id: "o",
+    name: "OAKTEK",
+    congratulated: false,
+    live: false,
+    ongoingPhaseIndex: 0,
+    phases: [],
+  },
+  {
+    id: "f",
+    name: "FortitudeTech",
+    congratulated: false,
+    live: false,
+    ongoingPhaseIndex: 0,
+    phases: [],
+  },
 ];
 
 const createDefaultStartup = (): Startup => ({
   id: nanoid(6), // TODO: Extract id generator fn to lib/utils.
   name: "New Startup",
   phases: [],
+  congratulated: false,
   live: false,
+  ongoingPhaseIndex: 0,
 });
 
 const createPhase = (phase: Partial<Phase>): Phase => ({
@@ -142,6 +167,15 @@ const updateTask = (
       : task
   );
 
+const resolveOngoingPhaseIndex = (phases: Phase[]): number => {
+  return phases.findIndex(
+    (phase) => !phase.completed && phase.tasks.length > 0
+  );
+};
+
+const isEveryPhaseCompleted = (phases: Phase[]) =>
+  phases.every(({ completed }) => completed) && phases.length > 0;
+
 type TasksUpdaterFn = (tasks: Task[]) => Task[];
 const updateStartupPhaseTasks = (
   startupId: string,
@@ -155,14 +189,15 @@ const updateStartupPhaseTasks = (
         const tasks = tasksUpdater(phase.tasks);
         return {
           ...phase,
-          completed: tasks.every(({ done }) => done),
+          completed: tasks.every(({ done }) => done) && tasks.length > 0,
           tasks,
         };
       });
       return {
         ...startup,
-        live: phases.every(({ completed }) => completed),
+        live: isEveryPhaseCompleted(phases),
         phases,
+        ongoingPhaseIndex: resolveOngoingPhaseIndex(phases),
       };
     }),
   };
@@ -198,10 +233,14 @@ const stateCreator: StateCreator<AppState> = (set, get) => ({
 
   addPhase: (startupId, phase) =>
     set({
-      startups: updateStartup(startupId, get().startups, (startup) => ({
-        ...startup,
-        phases: [...startup.phases, createPhase(phase)],
-      })),
+      startups: updateStartup(startupId, get().startups, (startup) => {
+        const phases = [...startup.phases, createPhase(phase)];
+        return {
+          ...startup,
+          live: isEveryPhaseCompleted(phases),
+          phases,
+        };
+      }),
     }),
 
   updatePhase: (startupId, phaseId, phaseUpdates) =>
@@ -213,18 +252,16 @@ const stateCreator: StateCreator<AppState> = (set, get) => ({
     }),
 
   addTask: (startupId, phaseId, task) =>
-    set((state) => {
-      return updateStartupPhaseTasks(
-        startupId,
-        phaseId,
-        state.startups,
-        (tasks) => [...tasks, createTask(task)]
-      );
-    }),
+    set(
+      updateStartupPhaseTasks(startupId, phaseId, get().startups, (tasks) => [
+        ...tasks,
+        createTask(task),
+      ])
+    ),
 
   updateTask: (startupId, phaseId, taskId, taskUpdates) =>
-    set((state) =>
-      updateStartupPhaseTasks(startupId, phaseId, state.startups, (tasks) =>
+    set(
+      updateStartupPhaseTasks(startupId, phaseId, get().startups, (tasks) =>
         updateTask(taskId, tasks, taskUpdates)
       )
     ),

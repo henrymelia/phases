@@ -16,5 +16,7 @@ export type Startup = {
   id: string;
   name: string;
   phases: Phase[];
+  ongoingPhaseIndex: number;
+  congratulated: boolean;
   live: boolean;
 };

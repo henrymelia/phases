@@ -9,8 +9,7 @@ import {
 } from "react";
 import EditableText from "../lib/EditableText";
 import StartupPhase from "../StartupPhase";
-import { Phase } from "../../state/types";
-// import AlertDialogDemo from "../lib/AlertDialog";
+import AlertDialog from "../lib/AlertDialog";
 
 function StartupProgress() {
   const { id } = useParams();
@@ -24,18 +23,36 @@ function StartupProgress() {
     unsetRedirectToStartupId,
     addPhase,
   } = useStartupStore();
-  const [newPhaseTitle, setNewPhaseTitle] = useState<string>("");
+  const [newPhaseTitle, setNewPhaseTitle] = useState("");
+  const [randomPhrase, setRandomPhrase] = useState(null);
+
+  useEffect(() => {
+    if (startup?.live && !startup.congratulated) {
+      // eslint-disable-next-line no-inner-declarations
+      async function retrievePhrase() {
+        const res = await fetch(
+          "https://uselessfacts.jsph.pl/api/v2/facts/random"
+        );
+        const parsedRes = await res.json();
+        setRandomPhrase(parsedRes.text);
+        updateStartup(startupId, { congratulated: true });
+      }
+
+      retrievePhrase();
+    }
+  }, [startup]);
 
   useEffect(() => {
     setNewPhaseTitle("");
     if (id === redirectToStartupId) {
       unsetRedirectToStartupId();
     }
+    setRandomPhrase(null);
   }, [redirectToStartupId, unsetRedirectToStartupId, id]);
 
   if (!startup || !id) return <span>Not found.</span>;
 
-  const { name, phases, id: startupId } = startup;
+  const { name, phases, id: startupId, live } = startup;
 
   const onDeleteButtonClick = () => deleteStartup(id);
 
@@ -61,13 +78,8 @@ function StartupProgress() {
     }
   };
 
-  const isPhaseDisabled = (phase: Phase, phaseIndex: number): boolean => {
-    if (phaseIndex > 0 && !phases[phaseIndex - 1].completed) return true;
-    if (phaseIndex > 0 && phases[phaseIndex - 1].completed && !phase.completed)
-      return false;
-    if (phaseIndex < phases.length - 1 && phase.completed) return false;
-    return false;
-  };
+  const isPhaseDisabled = (phaseIndex: number): boolean =>
+    startup.ongoingPhaseIndex >= 0 && startup.ongoingPhaseIndex < phaseIndex;
 
   return (
     <div className="px-10">
@@ -76,7 +88,8 @@ function StartupProgress() {
       </div>
 
       <h1 className="text-3xl font-medium pb-4">
-        <EditableText text={name} onSave={onStartupNameUpdate} />
+        <EditableText text={name} onSave={onStartupNameUpdate} />{" "}
+        {live && "LIVE"}
       </h1>
 
       <ul className="pl-4">
@@ -86,7 +99,7 @@ function StartupProgress() {
             startupId={startupId}
             position={index + 1}
             phase={phase}
-            disabled={isPhaseDisabled(phase, index)}
+            disabled={isPhaseDisabled(index)}
           />
         ))}
         <li className="mt-4">
@@ -100,8 +113,14 @@ function StartupProgress() {
           />
         </li>
       </ul>
-      {/* TODO: Inform the user */}
-      {/* <AlertDialogDemo /> */}
+
+      <AlertDialog
+        title={`${name} project is live!`}
+        onDismiss={() => setRandomPhrase(null)}
+        show={!!randomPhrase}
+      >
+        <p className="mt-1 text-sm text-gray-700 max-w-xs">{randomPhrase}</p>
+      </AlertDialog>
     </div>
   );
 }
