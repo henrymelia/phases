@@ -1,7 +1,13 @@
 import { StateCreator, create } from "zustand";
 import { Phase, Startup, Task } from "./types";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { nanoid } from "nanoid";
+import { createDefaultStartup, updateStartup } from "./models/startup";
+import {
+  createPhase,
+  isEveryPhaseCompleted,
+  updatePhase,
+} from "./models/phase";
+import { createTask, updateStartupPhaseTasks, updateTask } from "./models/task";
 
 type AppState = {
   startups: Startup[];
@@ -99,109 +105,6 @@ const initialStartupsState: Startup[] = [
     phases: [],
   },
 ];
-
-const createDefaultStartup = (): Startup => ({
-  id: nanoid(6), // TODO: Extract id generator fn to lib/utils.
-  name: "New Startup",
-  phases: [],
-  congratulated: false,
-  live: false,
-  ongoingPhaseIndex: 0,
-});
-
-const createPhase = (phase: Partial<Phase>): Phase => ({
-  id: nanoid(6),
-  title: "New Phase",
-  tasks: [],
-  completed: false,
-  ...phase,
-});
-
-const createTask = (task: Partial<Task>): Task => ({
-  id: nanoid(6),
-  done: false,
-  title: "New Task",
-  description: "New Task Description",
-  ...task,
-});
-
-type StartupUpdaterFn = (startup: Startup) => Startup;
-const updateStartup = (
-  startupId: string,
-  startups: Startup[],
-  startupUpdater: StartupUpdaterFn | Partial<Startup>
-) =>
-  startups.map((startup) =>
-    startup.id === startupId
-      ? typeof startupUpdater === "object"
-        ? { ...startup, ...startupUpdater }
-        : { ...startupUpdater(startup) }
-      : startup
-  );
-
-type PhaseUpdaterFn = (phase: Phase) => Phase;
-const updatePhase = (
-  phaseId: string,
-  phases: Phase[],
-  phaseUpdater: PhaseUpdaterFn | Partial<Phase>
-) =>
-  phases.map((phase) =>
-    phase.id === phaseId
-      ? typeof phaseUpdater === "object"
-        ? { ...phase, ...phaseUpdater }
-        : { ...phaseUpdater(phase) }
-      : phase
-  );
-
-type TaskUpdaterFn = (task: Task) => Task;
-const updateTask = (
-  taskId: string,
-  tasks: Task[],
-  taskUpdater: TaskUpdaterFn | Partial<Task>
-) =>
-  tasks.map((task) =>
-    task.id === taskId
-      ? typeof taskUpdater === "object"
-        ? { ...task, ...taskUpdater }
-        : { ...taskUpdater(task) }
-      : task
-  );
-
-const resolveOngoingPhaseIndex = (phases: Phase[]): number => {
-  return phases.findIndex(
-    (phase) => !phase.completed && phase.tasks.length > 0
-  );
-};
-
-const isEveryPhaseCompleted = (phases: Phase[]) =>
-  phases.every(({ completed }) => completed) && phases.length > 0;
-
-type TasksUpdaterFn = (tasks: Task[]) => Task[];
-const updateStartupPhaseTasks = (
-  startupId: string,
-  phaseId: string,
-  startups: Startup[],
-  tasksUpdater: TasksUpdaterFn
-) => {
-  return {
-    startups: updateStartup(startupId, startups, (startup) => {
-      const phases = updatePhase(phaseId, startup.phases, (phase) => {
-        const tasks = tasksUpdater(phase.tasks);
-        return {
-          ...phase,
-          completed: tasks.every(({ done }) => done) && tasks.length > 0,
-          tasks,
-        };
-      });
-      return {
-        ...startup,
-        live: isEveryPhaseCompleted(phases),
-        phases,
-        ongoingPhaseIndex: resolveOngoingPhaseIndex(phases),
-      };
-    }),
-  };
-};
 
 const stateCreator: StateCreator<AppState> = (set, get) => ({
   redirectToStartupId: null,
