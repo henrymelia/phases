@@ -109,7 +109,7 @@ function StartupProgress() {
           />
         ))}
         <li className="mt-4">
-          <PhaseHeading position={phases.length + 1}>
+          <PhaseHeading position={phases.length + 1} disabled>
             <input
               type="text"
               value={newPhaseTitle}
