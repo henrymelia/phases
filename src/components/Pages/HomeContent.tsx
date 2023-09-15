@@ -5,7 +5,7 @@ function HomeContent() {
     <main className="px-10 flex flex-col items-center gap-4">
       <h1 className="font-semibold text-2xl">Welcome to Phases App</h1>
       <div className="flex gap-4">
-        <p>👈</p>
+        <p className="text-4xl">👈</p>
         <p className="text-xl">
           Select an startup in the sidebar or create a new one.
         </p>
