@@ -12,7 +12,7 @@ type Props = {
   onSave: (updatedText: string) => void;
   editing?: boolean;
   placeholder?: string;
-} & ComponentPropsWithoutRef<"div">;
+} & ComponentPropsWithoutRef<"span">;
 
 const EditableText = ({
   text: initialText = "",
@@ -54,7 +54,7 @@ const EditableText = ({
   };
 
   return (
-    <span onClick={onTextClick} {...otherProps}>
+    <>
       {isEditing ? (
         <input
           ref={textUpdateInputRef}
@@ -64,12 +64,14 @@ const EditableText = ({
           onKeyUp={keyUpHandler}
           onBlur={onTextInputBlur}
           placeholder={placeholder}
-          className="w-auto"
+          {...otherProps}
         />
       ) : (
-        <span>{initialText}</span>
+        <span onClick={onTextClick} {...otherProps}>
+          {initialText}
+        </span>
       )}
-    </span>
+    </>
   );
 };
 

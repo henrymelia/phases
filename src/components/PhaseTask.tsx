@@ -24,14 +24,18 @@ function PhaseTask({ startupId, phaseId, task, disabled = false }: Props) {
     updateTask(startupId, phaseId, taskId, { done: !done });
 
   return (
-    <li className="py-0.5">
+    <li className="py-1">
       <input
         type="checkbox"
         checked={done}
         onChange={onTaskDoneChange}
         disabled={disabled}
       />{" "}
-      <EditableText text={task.title} onSave={onTaskTitleUpdate} />
+      <EditableText
+        text={task.title}
+        onSave={onTaskTitleUpdate}
+        className="p-1"
+      />
     </li>
   );
 }

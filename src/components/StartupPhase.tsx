@@ -46,7 +46,7 @@ function StartupPhase({ startupId, phase, position, disabled = false }: Props) {
         <EditableText
           text={phase.title}
           onSave={onUpdatePhaseTitle}
-          className="font-semibold text-2xl"
+          className="font-semibold text-2xl px-1"
         />
       </PhaseHeading>
 
@@ -60,7 +60,7 @@ function StartupPhase({ startupId, phase, position, disabled = false }: Props) {
             disabled={disabled}
           />
         ))}
-        <li className="py-0.5">
+        <li>
           <input type="checkbox" disabled />{" "}
           <input
             type="text"
@@ -68,6 +68,7 @@ function StartupPhase({ startupId, phase, position, disabled = false }: Props) {
             onChange={onNewTaskTitleChange}
             onKeyUp={onNewTaskTitleKeyUp}
             placeholder="Add a Task"
+            className="p-1"
           />
         </li>
       </ul>

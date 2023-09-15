@@ -31,12 +31,13 @@ function StartupProgress() {
     if (startup?.live && !startup.congratulated) {
       // eslint-disable-next-line no-inner-declarations
       async function retrievePhrase() {
+        if (!id) return;
         const res = await fetch(
           "https://uselessfacts.jsph.pl/api/v2/facts/random"
         );
         const parsedRes = await res.json();
         setRandomPhrase(parsedRes.text);
-        updateStartup(startupId, { congratulated: true });
+        updateStartup(id, { congratulated: true });
       }
 
       retrievePhrase();
@@ -53,13 +54,13 @@ function StartupProgress() {
 
   if (!startup || !id) return <span>Not found.</span>;
 
-  const { name, phases, id: startupId, live } = startup;
+  const { name, phases, live } = startup;
 
   const onDeleteButtonClick = () => deleteStartup(id);
 
   const onStartupNameUpdate = (updatedName: string) => {
     if (updatedName.length > 0) {
-      updateStartup(startupId, { name: updatedName });
+      updateStartup(id, { name: updatedName });
     }
   };
 
@@ -70,7 +71,7 @@ function StartupProgress() {
   const onNewPhaseTitleKeyUp: KeyboardEventHandler = (e) => {
     if (e.key === "Enter") {
       if (newPhaseTitle.length > 0) {
-        addPhase(startupId, { title: newPhaseTitle });
+        addPhase(id, { title: newPhaseTitle });
       }
     }
 
@@ -89,7 +90,11 @@ function StartupProgress() {
       </div>
 
       <h1 className="text-3xl font-medium pb-4">
-        <EditableText text={name} onSave={onStartupNameUpdate} />{" "}
+        <EditableText
+          text={name}
+          onSave={onStartupNameUpdate}
+          className="inline-block p-2"
+        />{" "}
         {live && <span className="text-green-600">(Live)</span>}
       </h1>
 
@@ -97,7 +102,7 @@ function StartupProgress() {
         {phases.map((phase, index) => (
           <StartupPhase
             key={phase.id}
-            startupId={startupId}
+            startupId={id}
             position={index + 1}
             phase={phase}
             disabled={isPhaseDisabled(index)}
@@ -111,6 +116,7 @@ function StartupProgress() {
               onChange={onNewPhaseTitleChange}
               onKeyUp={onNewPhaseTitleKeyUp}
               placeholder="Add a Phase"
+              className="font-semibold text-2xl px-1"
             />
           </PhaseHeading>
         </li>
