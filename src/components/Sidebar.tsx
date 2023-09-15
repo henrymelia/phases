@@ -17,7 +17,7 @@ export default function Sidebar() {
   return (
     <div className="flex flex-col justify-between text-center">
       <div className="px-4 py-6">
-        <span className="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
+        <span className="place-content-center rounded-lg text-base text-gray-600">
           PHASES APP
         </span>
 
