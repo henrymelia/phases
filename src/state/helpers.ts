@@ -1,8 +1,9 @@
-type AppModel = { id: string };
+export type ModelEntity = { id: string };
 
-type ItemUpdater<T> = (phase: T) => T;
+export type ItemUpdater<T> = (item: T) => T;
+
 export const createModelListUpdater =
-  <T extends AppModel>() =>
+  <T extends ModelEntity>() =>
   (itemId: string, itemList: T[], itemUpdater: ItemUpdater<T> | Partial<T>) =>
     itemList.map((item) =>
       item.id === itemId

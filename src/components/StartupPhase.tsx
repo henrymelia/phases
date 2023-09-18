@@ -13,7 +13,7 @@ type Props = {
 };
 
 function StartupPhase({ startupId, phase, position, disabled = false }: Props) {
-  const [newTaskTitle, setNewTaskTitle] = useState<string>("");
+  const [newTaskTitle, setNewTaskTitle] = useState("");
   const { addTask, updatePhase } = useStartupStore();
 
   const { id: phaseId, completed } = phase;

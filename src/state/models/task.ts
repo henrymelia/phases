@@ -1,6 +1,6 @@
 import { Startup, Task } from "../types";
 import { nanoid } from "nanoid";
-import { createModelListUpdater } from "../helpers";
+import { ItemUpdater, createModelListUpdater } from "../helpers";
 import { updateStartup } from "./startup";
 import {
   isEveryPhaseCompleted,
@@ -18,12 +18,11 @@ export const createTask = (task: Partial<Task>): Task => ({
 
 export const updateTask = createModelListUpdater<Task>();
 
-type TasksUpdaterFn = (tasks: Task[]) => Task[];
 export const updateStartupPhaseTasks = (
   startupId: string,
   phaseId: string,
   startups: Startup[],
-  tasksUpdater: TasksUpdaterFn
+  tasksUpdater: ItemUpdater<Task[]>
 ) => {
   return {
     startups: updateStartup(startupId, startups, (startup) => {

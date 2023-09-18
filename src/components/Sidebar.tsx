@@ -17,9 +17,12 @@ export default function Sidebar() {
   return (
     <div className="flex flex-col justify-between text-center">
       <div className="px-4 py-6">
-        <span className="place-content-center rounded-lg text-base text-gray-600">
+        <NavLink
+          to="/"
+          className="place-content-center rounded-lg text-base text-gray-600"
+        >
           PHASES APP
-        </span>
+        </NavLink>
 
         <div className="inset-x-0 bottom-0 border-t border-gray-100">
           <a href="#" className="flex items-center justify-center gap-2  p-4 ">

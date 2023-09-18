@@ -140,8 +140,8 @@ const stateCreator: StateCreator<AppState> = (set, get) => ({
         const phases = [...startup.phases, createPhase(phase)];
         return {
           ...startup,
-          live: isEveryPhaseCompleted(phases),
           phases,
+          live: isEveryPhaseCompleted(phases),
         };
       }),
     }),
